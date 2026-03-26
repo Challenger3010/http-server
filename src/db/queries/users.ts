@@ -1,5 +1,5 @@
-import { db } from "../index";
-import { User, users } from "../schema";
+import { db } from "../index.js";
+import { User, users } from "../schema.js";
 
 export async function createUser(user: User) {
   const [result] = await db
@@ -7,5 +7,11 @@ export async function createUser(user: User) {
     .values(user)
     .onConflictDoNothing()
     .returning();
+
+  return result;
+}
+
+export async function deleteUser() {
+  const result = await db.delete(users);
   return result;
 }

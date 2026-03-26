@@ -1,4 +1,3 @@
-import { DBQueryConfig } from "drizzle-orm";
 import type { MigrationConfig } from "drizzle-orm/migrator";
 
 type Config = {
@@ -9,6 +8,7 @@ type Config = {
 type APIConfig = {
   fileserverHits: number;
   port: number;
+  platform: string;
 };
 
 type DBConfig = {
@@ -16,7 +16,7 @@ type DBConfig = {
   migrationsConfig: MigrationConfig;
 };
 
-process.loadEnvFile("../.env");
+process.loadEnvFile(".env");
 
 const migrationConfig: MigrationConfig = {
   migrationsFolder: "./src/db/migrations",
@@ -26,6 +26,7 @@ export const config: Config = {
   api: {
     fileserverHits: 0,
     port: Number(getEnv("PORT")),
+    platform: getEnv("PLATFORM"),
   },
   db: {
     url: getEnv("DB_URL"),

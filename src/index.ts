@@ -9,6 +9,7 @@ import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
+import { hanlderCreateUser } from "./api/createUser.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationsConfig);
@@ -37,6 +38,14 @@ app.post("/admin/reset", async (req, res, next) => {
 app.post("/api/validate_chirp", async (req, res, next) => {
   try {
     await handlerValidate(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/users", async (req, res, next) => {
+  try {
+    await hanlderCreateUser(req, res);
   } catch (err) {
     next(err);
   }
