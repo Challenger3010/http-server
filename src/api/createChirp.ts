@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
-import { createChirp } from "../db/queries/chrips.js";
+import { createChirp, getChirps } from "../db/queries/chirps.js";
 
 const PROFANE_WORDS = ["kerfuffle", "sharbert", "fornax"] as const;
 
@@ -41,4 +41,11 @@ export async function hanlderCreateChirp(req: Request, res: Response) {
   }
 
   respondWithJSON(res, 201, newChirp);
+}
+
+export async function handlerGetAllChirps(req: Request, res: Response) {
+  const allChirps = await getChirps();
+  console.log(allChirps);
+
+  respondWithJSON(res, 200, allChirps);
 }
