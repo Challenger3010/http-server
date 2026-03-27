@@ -1,0 +1,1 @@
+ALTER TABLE "chirps" RENAME COLUMN "text" TO "body";
