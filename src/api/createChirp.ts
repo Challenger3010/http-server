@@ -1,7 +1,9 @@
 import type { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
-import { createChirp, getChirps } from "../db/queries/chirps.js";
+import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
+import { Chirp } from "../db/schema.js";
+import { NotFoundError } from "../errors/NotFoundError.js";
 
 const PROFANE_WORDS = ["kerfuffle", "sharbert", "fornax"] as const;
 
@@ -48,4 +50,19 @@ export async function handlerGetAllChirps(req: Request, res: Response) {
   console.log(allChirps);
 
   respondWithJSON(res, 200, allChirps);
+}
+
+export async function handlerGetSingleChirp(req: Request, res: Response) {
+  const { chirpId } = req.params;
+
+  if (typeof chirpId != "string") {
+    throw new NotFoundError("Please provide a valid ID");
+  }
+
+  try {
+    const chirp: Chirp = await getChirp(chirpId);
+    respondWithJSON(res, 200, chirp);
+  } catch (err) {
+    throw new NotFoundError("No Chipr found with this ID");
+  }
 }

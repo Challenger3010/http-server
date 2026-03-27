@@ -1,7 +1,8 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { Chirp, chirps } from "../schema.js";
 import { BadRequestError } from "../../errors/BadRequestError.js";
+import { NotFoundError } from "../../errors/NotFoundError.js";
 
 export async function createChirp(chirp: Chirp) {
   const [result] = await db
@@ -21,6 +22,16 @@ export async function getChirps() {
 
   if (!result) {
     throw new BadRequestError("No Chirps available");
+  }
+
+  return result;
+}
+
+export async function getChirp(chirpId: string) {
+  const [result] = await db.select().from(chirps).where(eq(chirps.id, chirpId));
+
+  if (!result) {
+    throw new NotFoundError("No Chirp found");
   }
 
   return result;
