@@ -1,19 +1,29 @@
 import type { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
-import { BadRequestError } from "../errors/BadRequestError.js";
 import { createChirp, getChirp, getChirps } from "../db/queries/chirps.js";
 import { Chirp } from "../db/schema.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
+import { UnauthorizedError } from "../errors/UnauthorizedError.js";
+import { BadRequestError } from "../errors/BadRequestError.js";
 
 const PROFANE_WORDS = ["kerfuffle", "sharbert", "fornax"] as const;
 
 export async function hanlderCreateChirp(req: Request, res: Response) {
   type parameters = {
     body: string;
-    userId: string;
   };
 
   const params: parameters = req.body;
+
+  const token = getBearerToken(req);
+
+  let userId = validateJWT(token, config.api.secret);
+
+  if (!userId) {
+    throw new UnauthorizedError("Invalid token, you are not authorized");
+  }
 
   const maxChirpLength = 140;
   if (params.body.length > maxChirpLength) {
@@ -35,7 +45,7 @@ export async function hanlderCreateChirp(req: Request, res: Response) {
 
   const newChirp = await createChirp({
     body: cleanBody,
-    userId: params.userId,
+    userId: userId,
   });
 
   if (!newChirp) {

@@ -15,7 +15,7 @@ export async function hanlderCreateUser(req: Request, res: Response) {
 
   const params: parameters = req.body;
 
-  if (!params.email || params.password) {
+  if (!params.email || !params.password) {
     throw new BadRequestError("Missing required fields");
   }
 
