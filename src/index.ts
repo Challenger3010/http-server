@@ -16,6 +16,8 @@ import {
   hanlderCreateChirp,
 } from "./api/createChirp.js";
 
+import { handlerLogin } from "./api/login.js";
+
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationsConfig);
 
@@ -44,6 +46,14 @@ app.post("/admin/reset", async (req, res, next) => {
 app.post("/api/users", async (req, res, next) => {
   try {
     await hanlderCreateUser(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/login", async (req, res, next) => {
+  try {
+    await handlerLogin(req, res);
   } catch (err) {
     next(err);
   }
