@@ -8,7 +8,7 @@ import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
-import { hanlderCreateUser } from "./api/createUser.js";
+import { handlerUpdateUser, hanlderCreateUser } from "./api/user.js";
 import {
   handlerGetAllChirps,
   handlerGetSingleChirp,
@@ -86,6 +86,14 @@ app.post("/api/revoke", async (req, res, next) => {
 app.get("/api/chirps", async (req, res, next) => {
   try {
     await handlerGetAllChirps(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.put("/api/users", async (req, res, next) => {
+  try {
+    await handlerUpdateUser(req, res);
   } catch (err) {
     next(err);
   }

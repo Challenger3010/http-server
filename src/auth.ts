@@ -53,7 +53,7 @@ export function validateJWT(tokenString: string, secret: string): string {
 export function getBearerToken(req: Request): string {
   let token = req.get("Authorization");
   if (!token) {
-    throw new Error("No token");
+    throw new UnauthorizedError("No token");
   }
   token = token.slice(7);
 

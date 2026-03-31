@@ -24,7 +24,8 @@ export async function revokeToken(token: string) {
   const rows = await db
     .update(tokens)
     .set({ revokedAt: new Date() })
-    .where(eq(tokens.token, token));
+    .where(eq(tokens.token, token))
+    .returning();
 
   if (rows.length === 0) {
     throw new Error("Couldn't revoke token");

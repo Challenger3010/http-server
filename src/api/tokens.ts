@@ -41,8 +41,6 @@ export async function handlerRevoke(req: Request, res: Response) {
   }
   token = token.slice(7);
 
-  console.log("HIER SOLLTE DER REFRESH TOKEN SEIN: ", token);
-
   await revokeToken(token);
 
   res.status(204).send();
