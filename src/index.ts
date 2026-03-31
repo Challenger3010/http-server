@@ -10,10 +10,11 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
 import { handlerUpdateUser, hanlderCreateUser } from "./api/user.js";
 import {
+  handlerDeleteChirp,
   handlerGetAllChirps,
   handlerGetSingleChirp,
   hanlderCreateChirp,
-} from "./api/createChirp.js";
+} from "./api/chirp.js";
 
 import { handlerLogin } from "./api/login.js";
 import { handlerRefresh, handlerRevoke } from "./api/tokens.js";
@@ -102,6 +103,14 @@ app.put("/api/users", async (req, res, next) => {
 app.get("/api/chirps/:chirpId", async (req, res, next) => {
   try {
     await handlerGetSingleChirp(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete("/api/chirps/:chirpId", async (req, res, next) => {
+  try {
+    await handlerDeleteChirp(req, res);
   } catch (err) {
     next(err);
   }

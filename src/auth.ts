@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import * as crypto from "node:crypto";
 import { UnauthorizedError } from "./errors/UnauthorizedError.js";
+import { ForbiddenError } from "./errors/ForbiddenError.js";
 
 export type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -43,7 +44,7 @@ export function validateJWT(tokenString: string, secret: string): string {
     }
     return decoded.sub;
   } catch (e) {
-    if (e instanceof Error && e.message === "No subject in token") {
+    if (e instanceof UnauthorizedError && e.message === "No subject in token") {
       throw e;
     }
     throw new UnauthorizedError("Error with JWT expired or invalid");
@@ -53,7 +54,7 @@ export function validateJWT(tokenString: string, secret: string): string {
 export function getBearerToken(req: Request): string {
   let token = req.get("Authorization");
   if (!token) {
-    throw new UnauthorizedError("No token");
+    throw new UnauthorizedError("UNAUTH");
   }
   token = token.slice(7);
 

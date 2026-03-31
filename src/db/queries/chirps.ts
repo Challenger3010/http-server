@@ -36,3 +36,13 @@ export async function getChirp(chirpId: string) {
 
   return result;
 }
+
+export async function deleteChirp(chirpId: string) {
+  const rows = await db.delete(chirps).where(eq(chirps.id, chirpId));
+
+  if (rows.length < 0) {
+    throw new NotFoundError("No Chirp found");
+  }
+
+  return rows.length > 0;
+}
