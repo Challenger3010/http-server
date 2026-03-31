@@ -1,8 +1,10 @@
 import * as argon2 from "argon2";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-
 import type { JwtPayload } from "jsonwebtoken";
+import * as crypto from "node:crypto";
+import { UnauthorizedError } from "./errors/UnauthorizedError.js";
+
 export type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
 export async function hashPassword(password: string): Promise<string> {
@@ -37,14 +39,14 @@ export function validateJWT(tokenString: string, secret: string): string {
   try {
     const decoded = jwt.verify(tokenString, secret) as payload;
     if (!decoded.sub || decoded.sub === "") {
-      throw new Error("No subject in token");
+      throw new UnauthorizedError("No subject in token");
     }
     return decoded.sub;
   } catch (e) {
     if (e instanceof Error && e.message === "No subject in token") {
       throw e;
     }
-    throw new Error("Error with JWT expired or invalid");
+    throw new UnauthorizedError("Error with JWT expired or invalid");
   }
 }
 
@@ -56,4 +58,10 @@ export function getBearerToken(req: Request): string {
   token = token.slice(7);
 
   return token;
+}
+
+export function makeRefreshToken() {
+  const hexString = crypto.randomBytes(32).toString("hex");
+
+  return hexString;
 }

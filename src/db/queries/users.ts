@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../index.js";
-import { User, users } from "../schema.js";
+import { RefreshToken, tokens, User, users } from "../schema.js";
 
 export async function createUser(user: User) {
   const [result] = await db
@@ -27,4 +27,14 @@ export async function findByEmail(email: string) {
   } catch (e) {
     return undefined;
   }
+}
+
+export async function getUserFromRefreshToken(token: string) {
+  const [result] = await db
+    .select()
+    .from(tokens)
+    .innerJoin(users, eq(tokens.userId, users.id))
+    .where(eq(tokens.token, token));
+
+  return result;
 }

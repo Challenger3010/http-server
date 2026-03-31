@@ -1,17 +1,16 @@
 import type { Request, Response } from "express";
 import { findByEmail } from "../db/queries/users.js";
 import { User } from "../db/schema.js";
-import { checkPasswordHash, getBearerToken, makeJWT } from "../auth.js";
+import { checkPasswordHash, makeJWT, makeRefreshToken } from "../auth.js";
 import { UnauthorizedError } from "../errors/UnauthorizedError.js";
 import { respondWithJSON } from "./json.js";
-import { UserResponse } from "./createUser.js";
 import { config } from "../config.js";
+import { createRefreshToken } from "../db/queries/token.js";
 
 export async function handlerLogin(req: Request, res: Response) {
   type parameters = {
     email: string;
     password: string;
-    expiresIn?: number;
   };
 
   const params: parameters = req.body;
@@ -24,15 +23,14 @@ export async function handlerLogin(req: Request, res: Response) {
 
   const match = await checkPasswordHash(foundUser.hashedPw, params.password);
 
-  let expiresIn: number;
+  const accessToken = makeJWT(foundUser.id as string, 3600, config.api.secret);
+  const refreshToken = makeRefreshToken();
 
-  if (params.expiresIn) {
-    expiresIn = params.expiresIn > 60 ? 60 : params.expiresIn;
-  } else {
-    expiresIn = 60;
+  try {
+    await createRefreshToken(refreshToken, foundUser.id as string);
+  } catch (e) {
+    throw new Error("Error creating refresh token");
   }
-
-  const token = makeJWT(foundUser.id as string, expiresIn, config.api.secret);
 
   if (!match) {
     throw new UnauthorizedError("incorrect email or password");
@@ -43,6 +41,7 @@ export async function handlerLogin(req: Request, res: Response) {
     email: foundUser.email,
     createdAt: foundUser.createdAt,
     updatedAt: foundUser.updatedAt,
-    token: token,
+    token: accessToken,
+    refreshToken: refreshToken,
   });
 }
