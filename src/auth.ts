@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import * as crypto from "node:crypto";
 import { UnauthorizedError } from "./errors/UnauthorizedError.js";
-import { ForbiddenError } from "./errors/ForbiddenError.js";
 
 export type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -65,4 +64,14 @@ export function makeRefreshToken() {
   const hexString = crypto.randomBytes(32).toString("hex");
 
   return hexString;
+}
+
+export function getAPIKey(req: Request) {
+  let token = req.get("Authorization");
+  if (!token) {
+    throw new UnauthorizedError("UNAUTH");
+  }
+  token = token.slice(7);
+
+  return token;
 }
