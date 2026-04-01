@@ -41,6 +41,7 @@ export async function handlerLogin(req: Request, res: Response) {
     email: foundUser.email,
     createdAt: foundUser.createdAt,
     updatedAt: foundUser.updatedAt,
+    isChirpyRed: foundUser.isChirpyRed,
     token: accessToken,
     refreshToken: refreshToken,
   });

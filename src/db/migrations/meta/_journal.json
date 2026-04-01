@@ -71,6 +71,13 @@
       "when": 1774958814219,
       "tag": "0009_daffy_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1775043860921,
+      "tag": "0010_oval_malice",
+      "breakpoints": true
     }
   ]
 }

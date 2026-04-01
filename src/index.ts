@@ -18,6 +18,7 @@ import {
 
 import { handlerLogin } from "./api/login.js";
 import { handlerRefresh, handlerRevoke } from "./api/tokens.js";
+import { handlerWebhook } from "./api/webhook.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationsConfig);
@@ -119,6 +120,14 @@ app.delete("/api/chirps/:chirpId", async (req, res, next) => {
 app.get("/api/healthz", async (req, res, next) => {
   try {
     await handlerReadiness(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/polka/webhooks", async (req, res, next) => {
+  try {
+    await handlerWebhook(req, res);
   } catch (err) {
     next(err);
   }

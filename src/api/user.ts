@@ -61,6 +61,7 @@ export async function handlerUpdateUser(req: Request, res: Response) {
       email: user.email,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      isChirpyRed: user.isChirpyRed,
     });
   } catch (e) {
     throw new UnauthorizedError("Not Auth");
