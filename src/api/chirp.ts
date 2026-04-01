@@ -5,6 +5,7 @@ import {
   deleteChirp,
   getChirp,
   getChirps,
+  getChirpsbyUser,
 } from "../db/queries/chirps.js";
 import { Chirp } from "../db/schema.js";
 import { NotFoundError } from "../errors/NotFoundError.js";
@@ -60,8 +61,20 @@ export async function hanlderCreateChirp(req: Request, res: Response) {
 }
 
 export async function handlerGetAllChirps(req: Request, res: Response) {
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+
+  if (typeof authorIdQuery === "string") {
+    authorId = authorIdQuery;
+  }
+
+  if (authorId) {
+    const authorChirps = await getChirpsbyUser(authorId);
+    respondWithJSON(res, 200, authorChirps);
+    return;
+  }
+
   const allChirps = await getChirps();
-  console.log(allChirps);
 
   respondWithJSON(res, 200, allChirps);
 }
