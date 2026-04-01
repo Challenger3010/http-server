@@ -14,6 +14,7 @@ import { config } from "../config.js";
 import { UnauthorizedError } from "../errors/UnauthorizedError.js";
 import { BadRequestError } from "../errors/BadRequestError.js";
 import { ForbiddenError } from "../errors/ForbiddenError.js";
+import { setDefaultAutoSelectFamily } from "node:net";
 
 const PROFANE_WORDS = ["kerfuffle", "sharbert", "fornax"] as const;
 
@@ -62,19 +63,24 @@ export async function hanlderCreateChirp(req: Request, res: Response) {
 
 export async function handlerGetAllChirps(req: Request, res: Response) {
   let authorId = "";
+  let sort = "";
   let authorIdQuery = req.query.authorId;
+  let sortQuery = req.query.sort;
 
   if (typeof authorIdQuery === "string") {
     authorId = authorIdQuery;
   }
+  if (typeof sortQuery === "string") {
+    sort = sortQuery;
+  }
 
   if (authorId) {
-    const authorChirps = await getChirpsbyUser(authorId);
+    const authorChirps = await getChirpsbyUser(authorId, sort);
     respondWithJSON(res, 200, authorChirps);
     return;
   }
 
-  const allChirps = await getChirps();
+  const allChirps = await getChirps(sort);
 
   respondWithJSON(res, 200, allChirps);
 }

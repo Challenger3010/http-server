@@ -1,8 +1,9 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { db } from "../index.js";
 import { Chirp, chirps } from "../schema.js";
 import { BadRequestError } from "../../errors/BadRequestError.js";
 import { NotFoundError } from "../../errors/NotFoundError.js";
+import { asc, desc } from "drizzle-orm";
 
 export async function createChirp(chirp: Chirp) {
   const [result] = await db
@@ -14,11 +15,12 @@ export async function createChirp(chirp: Chirp) {
   return result;
 }
 
-export async function getChirps() {
-  const result = await db
-    .select()
-    .from(chirps)
-    .orderBy(sql`${chirps.createdAt} ASC`);
+export async function getChirps(sort?: string) {
+  const order =
+    sort?.toUpperCase() === "DESC" ?
+      desc(chirps.createdAt)
+    : asc(chirps.createdAt);
+  const result = await db.select().from(chirps).orderBy(order);
 
   if (!result) {
     throw new BadRequestError("No Chirps available");
@@ -47,11 +49,16 @@ export async function deleteChirp(chirpId: string) {
   return rows.length > 0;
 }
 
-export async function getChirpsbyUser(userId: string) {
+export async function getChirpsbyUser(userId: string, sort?: string) {
+  const order =
+    sort?.toUpperCase() === "DESC" ?
+      desc(chirps.createdAt)
+    : asc(chirps.createdAt);
   const results = await db
     .select()
     .from(chirps)
-    .where(eq(chirps.userId, userId));
+    .where(eq(chirps.userId, userId))
+    .orderBy(order);
 
   return results;
 }
